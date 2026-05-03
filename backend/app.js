@@ -1,5 +1,5 @@
 const express = require("express");
-const cors = require("cors"); // 1. Import the cors package
+const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require("./src/config/db");
 const requestRoutes = require("./src/routes/requests");
@@ -12,7 +12,13 @@ console.log("APP STARTED");
 const app = express();
 
 // Middleware
-app.use(cors()); // 2. Enable CORS - This MUST be before your routes
+// تحديث الـ CORS للسماح فقط لموقعك على Vercel بالوصول للبيانات
+app.use(cors({
+  origin: "https://food-rescue-vert.vercel.app", // لينك الـ Frontend بتاعك
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
+
 app.use(express.json());
 
 // Test Route
