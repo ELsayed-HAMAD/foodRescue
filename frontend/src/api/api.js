@@ -1,10 +1,9 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api', // Ensure this matches your backend port
+  // تم تغيير localhost إلى لينك Railway الحقيقي الخاص بك
+  baseURL: 'https://zooming-illumination-production-33f2.up.railway.app/api', 
 });
-
-// ... rest of your interceptor code
 
 api.interceptors.request.use((config) => {
   const user = JSON.parse(localStorage.getItem('user'));
