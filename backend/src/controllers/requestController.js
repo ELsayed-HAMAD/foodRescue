@@ -98,7 +98,7 @@ exports.getRequestsForFood = async (req, res) => {
     const { foodId } = req.params;
 
     const requests = await Request.find({ food: foodId }).populate(
-      "charity",
+      "requester",
       "name email",
     );
 
