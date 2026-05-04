@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://aware-mindfulness-production.up.railway.app/api',
+  baseURL: 'https://foodrescue-production-73fb.up.railway.app/api',
 });
 
 api.interceptors.request.use((config) => {
