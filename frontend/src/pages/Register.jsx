@@ -8,10 +8,11 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
-  const handleRegister = async (e) => {
+ const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const response = await api.post('/auth/register', form); 
+      await api.post('/auth/register', form); 
+      
       toast.success('Registration successful!');
       navigate('/login');
     } catch (err) {
