@@ -83,7 +83,7 @@ exports.rejectRequest = async (req, res) => {
 exports.getRequests = async (req, res) => {
   try {
     const requests = await Request.find({
-      charity: req.user.id,
+      requester: req.user.id,
     }).populate("food");
 
     res.json(requests);

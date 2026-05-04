@@ -13,13 +13,13 @@ export default function CharityDash() {
   const query = new URLSearchParams(location.search);
   const activeTab = query.get("view") || "browse";
 
+  const userId = user?.user?._id || user?.id || user?._id;
   const charityName = user?.user?.name || user?.name || "Verified Charity";
 
   const [foods, setFoods] = useState([]);
   const [myRequests, setMyRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [requestingId, setRequestingId] = useState(null);
-  
   const [filterStatus, setFilterStatus] = useState('all');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   
@@ -48,7 +48,9 @@ export default function CharityDash() {
       setMyRequests(validRequests);
 
       const activeRequests = validRequests.filter(req => req.status !== 'rejected');
-      const requestedFoodIds = activeRequests.map(req => req.food._id);
+      const requestedFoodIds = activeRequests.map(req => 
+        (typeof req.food === 'object' ? req.food._id : req.food)
+      );
 
       const availableFoods = foodRes.data
         .filter(f => f.status === 'available' && !requestedFoodIds.includes(f._id))
@@ -76,13 +78,24 @@ export default function CharityDash() {
   const handleRequest = async (item) => {
     try {
       setRequestingId(item._id);
+      
       await api.post('/requests', { 
         food: item.name, 
         message: `Requested by: ${charityName}`, 
-        requester: user?.user?._id || user?.user?.id 
+        requester: userId 
       });
+
       toast.success(`Allocated: ${item.name}`);
-      gsap.to(`.card-${item._id}`, { opacity: 0, scale: 0.9, duration: 0.6, onComplete: () => fetchData() });
+
+      gsap.to(`.card-${item._id}`, { 
+        opacity: 0, 
+        scale: 0.9, 
+        duration: 0.4, 
+        onComplete: () => {
+          setFoods(prev => prev.filter(f => f._id !== item._id));
+        } 
+      });
+
     } catch (err) {
       toast.error("Transaction refused");
     } finally {
@@ -125,7 +138,7 @@ export default function CharityDash() {
                     <p>Origin: <span className="text-sm text-black">{item.location}</span></p>
                   </div>
                 </div>
-                <button onClick={() => handleRequest(item)} disabled={requestingId === item._id} className="mt-4 md:mt-0 w-full md:w-auto px-10 py-5 bg-black text-white text-[10px] font-black tracking-[0.4em] uppercase rounded-2xl hover:-translate-y-1 transition-all">
+                <button onClick={() => handleRequest(item)} disabled={requestingId === item._id} className="mt-4 md:mt-0 w-full md:w-auto px-10 py-5 bg-black text-white text-[10px] font-black tracking-[0.4em] uppercase rounded-2xl hover:-translate-y-1 transition-all disabled:opacity-50">
                   {requestingId === item._id ? "..." : "Commit"}
                 </button>
               </div>
@@ -168,15 +181,15 @@ export default function CharityDash() {
             </div>
           </div>
 
-          {/* Mobile cards — Only status badge on the right */}
+          {/* MISSING CODE RESTORED: Mobile cards — Only status badge on the right */}
           <div className="md:hidden space-y-3">
             {filteredRequests.length > 0 ? filteredRequests.map(req => (
               <div key={req._id} className="bg-white/40 backdrop-blur-xl rounded-[2rem] border border-white/60 shadow-sm p-6 flex flex-row justify-between items-start">
                 <div className="space-y-3">
-                  <p className="font-black text-gray-800 text-xl">{req.food.name}</p>
+                  <p className="font-black text-gray-800 text-xl">{req.food?.name || "Asset Removed"}</p>
                   <div>
                     <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Pickup Time</p>
-                    <p className="text-gray-600 font-bold text-sm tracking-wider">{req.food.pickup_time || "N/A"}</p>
+                    <p className="text-gray-600 font-bold text-sm tracking-wider">{req.food?.pickup_time || "N/A"}</p>
                   </div>
                 </div>
                 
@@ -208,8 +221,8 @@ export default function CharityDash() {
               <tbody className="divide-y divide-black/5">
                 {filteredRequests.length > 0 ? filteredRequests.map(req => (
                   <tr key={req._id} className="hover:bg-black/[0.01] transition-colors">
-                    <td className="p-8 font-black text-gray-800 text-xl">{req.food.name}</td>
-                    <td className="p-8 text-gray-600 font-bold text-sm tracking-wider">{req.food.pickup_time || "N/A"}</td>
+                    <td className="p-8 font-black text-gray-800 text-xl">{req.food?.name || "Asset Removed"}</td>
+                    <td className="p-8 text-gray-600 font-bold text-sm tracking-wider">{req.food?.pickup_time || "N/A"}</td>
                     <td className="p-8">
                       <span className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border ${req.status === 'rejected' ? 'bg-red-400/20 text-red-700 border-red-400/30' : req.status === 'pending' ? 'bg-yellow-400/20 text-yellow-700 border-yellow-400/30' : req.status === 'accepted' ? 'bg-blue-400/20 text-blue-700 border-blue-400/30' : 'bg-green-400/20 text-green-700 border-green-400/30'}`}>
                         {req.status}
@@ -219,9 +232,7 @@ export default function CharityDash() {
                 )) : (
                   <tr>
                     <td colSpan="3" className="p-12 text-center">
-                       <p className="text-gray-500 font-black uppercase tracking-widest text-sm">
-                         No {filterStatus !== 'all' ? filterStatus.replace('_', ' ') : ''} History Found
-                       </p>
+                       <p className="text-gray-500 font-black uppercase tracking-widest text-sm">No History Found</p>
                     </td>
                   </tr>
                 )}
