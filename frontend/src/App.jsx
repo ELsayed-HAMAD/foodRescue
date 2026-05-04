@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider } from './context/AuthProvider';
 import { useAuth } from './hooks/useAuth'; 
 import Navbar from './components/Navbar';
 import Landing from './pages/Landing';
@@ -13,7 +13,7 @@ function AppContent() {
   const location = useLocation();
   const { user } = useAuth(); 
   
-  // THE FIX: Removed '/restaurant' and '/charity' so the Navbar shows up there!
+  
   const hideNavbarOn = ['/login', '/signup'];
   const showNavbar = !hideNavbarOn.includes(location.pathname);
 

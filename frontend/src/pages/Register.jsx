@@ -8,7 +8,7 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
- const handleRegister = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     try {
       await api.post('/auth/register', form); 
