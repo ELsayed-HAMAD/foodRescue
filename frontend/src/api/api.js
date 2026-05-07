@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: 'http://food-rescue-isf6-euxb4azn7-elsayed-hamads-projects.vercel.app/api',
 });
 
 api.interceptors.request.use((config) => {
